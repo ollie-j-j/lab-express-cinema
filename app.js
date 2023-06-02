@@ -13,6 +13,8 @@ const express = require('express');
 // https://www.npmjs.com/package/hbs
 const hbs = require('hbs');
 
+const Movie = require('./models/Movie.model');
+
 const app = express();
 
 // ℹ️ This function is getting exported from the config folder. It runs most middlewares
@@ -27,6 +29,24 @@ app.locals.title = `${capitalized(projectName)}- Generated with Ironlauncher`;
 // 👇 Start handling routes here
 const index = require('./routes/index');
 app.use('/', index);
+
+app.get('/movies', (req, res) => {
+    Movie.find()
+        .then(allMovies => {
+            console.log('allMovies', allMovies);
+            res.render('movies', { allMovies });
+        })
+        .catch(err => console.log(err))
+})
+
+app.get('/movie/:id', (req, res) => {
+    Movie.findById(req.params.id)
+        .then(movieDetails => {
+            console.log('movieDetails', movieDetails);
+            res.render('details', { movieDetails });
+        })
+        .catch(err => console.log(err))
+})
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require('./error-handling')(app);
